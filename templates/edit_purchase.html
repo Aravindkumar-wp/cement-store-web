@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Purchase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white p-6 rounded shadow w-96">
+
+        <h2 class="text-lg font-bold mb-4">✏️ Edit Purchase</h2>
+
+        <form method="POST" class="space-y-4">
+
+            <input type="number" name="total" value="{{ p[1] }}" class="w-full p-2 border rounded" required>
+
+            <input type="number" name="paid" value="{{ p[2] }}" class="w-full p-2 border rounded" required>
+
+            <button class="bg-blue-600 text-white w-full py-2 rounded">
+                Update
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

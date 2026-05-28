@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Search Customer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search" class="block font-bold text-yellow-300">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer" class="block hover:text-gray-300">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale" class="block hover:text-gray-300">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments" class="block hover:text-gray-300">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers" class="block hover:text-gray-300">
+                        📂 Upload Excel
+                    </a>
+                </li>
+                <li>
+                    <a href="/download_report" class="block hover:text-gray-300">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance" class="block hover:text-gray-300">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/worker_payments" class="block hover:text-gray-300">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+
+            </ul>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 p-6 ml-64">
+
+            <!-- HEADER -->
+            <h1 class="text-2xl font-bold mb-6">🔍 Search Customers</h1>
+
+            <!-- SEARCH BAR -->
+            <div class="bg-white p-4 rounded-xl shadow mb-6">
+
+                <form method="POST" class="flex gap-3">
+
+                    <input type="text" name="query" placeholder="Search by name or phone..."
+                        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg">
+                        Search
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- RESULTS -->
+            {% if results %}
+
+            <div class="bg-white p-6 rounded-xl shadow">
+
+                <h2 class="text-lg font-semibold mb-4">Results</h2>
+
+                <table class="w-full text-sm">
+                    <tr class="bg-gray-800 text-white">
+                        <th class="p-2">ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+
+                    {% for row in results %}
+                    <tr class="border hover:bg-gray-50">
+                        <td class="p-2">{{ row[0] }}</td>
+
+                        <td class="font-semibold">{{ row[1] }}</td>
+
+                        <td>{{ row[2] or '—' }}</td>
+
+                        <td>{{ row[3] or '—' }}</td>
+
+                        <td>
+                            <a href="/customer/{{ row[0] }}"
+                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <!-- EMPTY STATE -->
+            <div class="bg-white p-6 rounded-xl shadow text-center text-gray-500">
+                No customers found. Try searching something else.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

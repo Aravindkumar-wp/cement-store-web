@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mark Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- ✅ SIDEBAR (FULL + ACTIVE) -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- ✅ MAIN CONTENT -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">✔ Mark Attendance</h1>
+
+            <form method="POST" action="/mark_attendance_save">
+
+
+
+                <!-- 🔥 CONTROL BAR -->
+                <!-- DATE (must be inside form!) -->
+
+                <div class="bg-white p-4 rounded-xl shadow mb-5 flex flex-wrap gap-3 items-center">
+
+                    <input type="date" name="date" value="{{ selected_date }}" class="border p-2 rounded">
+
+                    <a href="/attendance" class="bg-gray-600 text-white px-4 py-2 rounded">
+                        📋 View Attendance
+                    </a>
+
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+                        ✔ Save Attendance
+                    </button>
+
+                </div>
+
+                <!-- 🔥 WORKER CARDS -->
+                <div class="space-y-4">
+
+                    {% for w in workers %}
+
+                    <div class="bg-white p-5 rounded-xl shadow flex flex-col gap-4">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+                                <h2 class="font-semibold text-lg">{{ w[1] }}</h2>
+                                <p class="text-sm text-gray-500">Worker ID: {{ w[0] }}</p>
+                            </div>
+
+                            <!-- STATUS -->
+                            <select name="status_{{ w[0] }}" class="border p-2 rounded">
+                                <option value="" selected disabled>-- Select Status --</option>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Half">Half Day</option>
+                            </select>
+
+                        </div>
+
+                        <div class="flex gap-6">
+
+                            <div>
+                                <label class="text-sm">Check In</label>
+                                <input type="time" name="check_in_{{ w[0] }}" class="border p-2 rounded w-40">
+                            </div>
+
+                            <div>
+                                <label class="text-sm">Check Out</label>
+                                <input type="time" name="check_out_{{ w[0] }}" class="border p-2 rounded w-40">
+                            </div>
+
+                        </div>
+
+                        <input type="hidden" name="worker_ids" value="{{ w[0] }}">
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

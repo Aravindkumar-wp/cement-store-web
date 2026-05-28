@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">✏️ Edit Attendance</h1>
+
+            <form method="POST" class="bg-white p-6 rounded-xl shadow w-96">
+
+                <label class="block mb-2">Status</label>
+
+                <select name="status" class="w-full p-2 border rounded mb-4">
+                    <option value="Present" {% if data[0]=='Present' %}selected{% endif %}>Present</option>
+                    <option value="Absent" {% if data[0]=='Absent' %}selected{% endif %}>Absent</option>
+                    <option value="Half" {% if data[0]=='Half' %}selected{% endif %}>Half Day</option>
+                </select>
+
+                <button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+                    Update
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

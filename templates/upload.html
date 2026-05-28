@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Upload Excel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block font-bold text-yellow-300">📂 Upload Excel</a></li>
+                <li><a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a></li>
+                <li><a href="/attendance" class="block hover:text-gray-300">🧑‍🏭 Attendance</a></li>
+                <li><a href="/worker_payments" class="block hover:text-gray-300">💸 Worker Advances</a></li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 ml-64 p-8">
+
+            <h1 class="text-2xl font-bold mb-2">📂 Upload Customer Data (Excel)</h1>
+            <p class="text-gray-500 mb-6">Dashboard › Upload Excel</p>
+
+            <!-- UPLOAD BOX -->
+            <div class="bg-white p-8 rounded-xl shadow-md border-2 border-dashed border-blue-300 text-center">
+
+                <form method="POST" enctype="multipart/form-data">
+
+                    <div class="mb-4">
+                        <div class="text-4xl mb-3">☁️</div>
+                        <p class="text-gray-600 mb-2">Upload Excel File Here</p>
+                        <p class="text-sm text-gray-400 mb-4">Accepted: .xlsx, .xls</p>
+
+                        <input type="file" name="file" accept=".xlsx,.xls" class="mx-auto block mb-4" required>
+
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                            Upload File
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- INSTRUCTIONS -->
+            <div class="bg-white mt-6 p-6 rounded-xl shadow">
+
+                <h2 class="font-semibold mb-3">📌 Upload Instructions</h2>
+
+                <p class="text-sm text-gray-600 mb-3">
+                    Excel headings must be exactly like this:
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border">
+                        <tr class="bg-gray-100">
+                            <th class="p-2 border">NAME OF THE CONSUMER</th>
+                            <th class="p-2 border">MOBILE NO</th>
+                            <th class="p-2 border">VILLAGE</th>
+                            <th class="p-2 border">Pending Amount</th>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border">N BASKAR GOUD</td>
+                            <td class="p-2 border">9492060507</td>
+                            <td class="p-2 border">NARSAPUR</td>
+                            <td class="p-2 border">5000</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <p class="text-sm text-red-600 mt-3">
+                    Pending Amount will be saved as customer opening pending balance.
+                </p>
+
+            </div>
+
+            <!-- UPLOAD HISTORY -->
+            <div class="bg-white mt-6 p-6 rounded-xl shadow">
+
+                <h3 class="text-lg font-semibold mb-3">📜 Upload History</h3>
+
+                <table class="w-full text-sm bg-white rounded shadow">
+                    <tr class="bg-gray-800 text-white">
+                        <th class="p-2">File Name</th>
+                        <th class="p-2">Date</th>
+                        <th class="p-2">Records</th>
+                        <th class="p-2">Status</th>
+                        <th class="p-2">Action</th>
+                    </tr>
+
+                    {% for h in history %}
+                    <tr class="border hover:bg-gray-50 text-center">
+                        <td class="p-2">{{ h[1] }}</td>
+                        <td class="p-2">{{ h[4] }}</td>
+                        <td class="p-2">{{ h[2] }}</td>
+                        <td class="p-2 text-green-600 font-semibold">{{ h[3] }}</td>
+                        <td class="p-2">
+                            <a href="/delete_upload/{{ h[0] }}"
+                                onclick="return confirm('Are you sure? This will delete ALL customers uploaded from this Excel file. This cannot be undone!')"
+                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

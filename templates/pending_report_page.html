@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+    <a href="/" class="text-blue-600">← Back to Dashboard</a>
+
+    <h1 class="text-3xl font-bold my-6">{{ title }}</h1>
+    {% if title == "All Pending" %}
+    <a href="/download_all_pending" class="bg-green-600 text-white px-4 py-2 rounded inline-block mb-4">
+        ⬇ Download All Pending Excel
+    </a>
+    {% endif %}
+    {% if title == "All Pending" %}
+
+    <a href="/download_all_pending_pdf" class="bg-red-600 text-white px-4 py-2 rounded inline-block mb-4 ml-2">
+        ⬇ Download All Pending PDF
+    </a>
+    {% endif %}
+
+    <div class="bg-white rounded-xl shadow p-5 overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 text-left">ID</th>
+                    <th class="p-3 text-left">Customer</th>
+                    <th class="p-3 text-left">Total Due</th>
+                    <th class="p-3 text-left">Sale Paid</th>
+                    <th class="p-3 text-left">Payment</th>
+                    <th class="p-3 text-left">Final Pending</th>
+                    <th class="p-3 text-left">Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in data %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3">{{ r[0] }}</td>
+                    <td class="p-3 font-semibold">{{ r[1] }}</td>
+                    <td class="p-3">{{ r[2] }}</td>
+                    <td class="p-3">₹{{ r[3] }}</td>
+                    <td class="p-3 text-green-700">₹{{ r[4] }}</td>
+                    <td class="p-3 text-blue-700">₹{{ r[5] }}</td>
+                    <td class="p-3 text-red-600 font-bold">₹{{ r[6] }}</td>
+                    <td class="p-3">{{ r[7] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

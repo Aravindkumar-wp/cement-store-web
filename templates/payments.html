@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Payments Dashboard</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white min-h-screen p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block font-bold text-yellow-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">💰 Payments Dashboard</h1>
+
+            <!-- TOP CARDS -->
+            <div class="grid grid-cols-4 gap-5 mb-6">
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Today's Collection</p>
+                    <h2 class="text-2xl font-bold text-green-600">₹{{ today }}</h2>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Collection</p>
+                    <h2 class="text-2xl font-bold text-blue-600">₹{{ total }}</h2>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Payments</p>
+                    <h2 class="text-2xl font-bold">{{ payments|length }}</h2>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Pending</p>
+                    <h2 class="text-2xl font-bold text-red-600">₹{{ overall_pending }}</h2>
+                </div>
+
+            </div>
+
+            <!-- CUSTOMER SELECT -->
+            <div class="mb-5">
+                <label class="text-sm font-medium">Select Customer</label>
+
+                <select id="customerSelect" class="w-full p-2 border rounded">
+                    <option value="">Search customer...</option>
+
+                    {% for c in customers %}
+                    <option value="{{ c[0] }}" {% if selected_customer_id and selected_customer_id|string==c[0]|string
+                        %}selected{% endif %}>
+                        {{ c[1] }} | 📞 {{ c[2] or 'No Phone' }} | 📍 {{ c[3] or '-' }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                {% if selected_customer %}
+                <p class="mt-2 text-sm text-blue-600">
+                    ✔ Selected:
+                    <b>
+                        {{ selected_customer[1] }}
+                        | 📞 {{ selected_customer[2] or 'No Phone' }}
+                        | 📍 {{ selected_customer[3] or '-' }}
+                    </b>
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- CUSTOMER SUMMARY -->
+            <div class="grid grid-cols-4 gap-5 mb-6">
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Purchase</p>
+                    <h2 class="text-xl font-bold">₹{{ total_purchase }}</h2>
+                </div>
+
+                <div class="bg-green-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Paid</p>
+                    <h2 class="text-xl font-bold text-green-700">₹{{ total_paid }}</h2>
+                </div>
+
+                <div class="bg-red-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Pending</p>
+                    <h2 class="text-xl font-bold text-red-600">₹{{ total_pending }}</h2>
+                </div>
+
+                <div class="bg-blue-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Last Payment</p>
+                    <h2 class="text-xl font-bold">₹{{ last_payment }}</h2>
+                    <p class="text-xs text-gray-500">{{ last_payment_date }}</p>
+                </div>
+
+            </div>
+
+            <!-- MAIN GRID -->
+            <div class="grid grid-cols-2 gap-6">
+
+                <!-- ADD PAYMENT -->
+                <div class="bg-white p-6 rounded-xl shadow">
+
+                    <h2 class="text-lg font-semibold mb-4">➕ Add Payment</h2>
+
+                    <form method="POST" action="/payments" class="space-y-4" onsubmit="return validateCustomer()">
+
+                        <!-- 🔥 IMPORTANT -->
+                        <input type="hidden" name="customer_id" id="hiddenCustomer">
+
+                        <div>
+                            <label>Amount</label>
+                            <input type="number" name="amount" class="w-full p-2 border rounded" required>
+                        </div>
+
+                        <div>
+                            <label>Mode</label>
+                            <select name="mode" class="w-full p-2 border rounded">
+                                <option>Cash</option>
+                                <option>UPI</option>
+                                <option>Bank</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Reference</label>
+                            <input type="text" name="reference" class="w-full p-2 border rounded">
+                        </div>
+
+                        <div>
+                            <label>Notes</label>
+                            <input type="text" name="notes" class="w-full p-2 border rounded">
+                        </div>
+
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-lg">
+                            Save Payment
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <!-- RECENT PAYMENTS -->
+                <div class="bg-white p-6 rounded-xl shadow">
+
+                    <h2 class="text-lg font-semibold mb-4">📜 Recent Payments</h2>
+
+                    <table class="w-full text-sm">
+                        <tr class="bg-gray-800 text-white">
+                            <th class="p-2">Customer</th>
+                            <th>Amount</th>
+                            <th>Mode</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+
+                        {% for p in payments %}
+                        <tr class="border hover:bg-gray-50">
+                            <td class="p-2">{{ p[1] }}</td>
+                            <td>₹{{ p[2] }}</td>
+
+                            <td>
+                                {% if p[3] == "Cash" %}
+                                <span class="bg-green-200 text-green-800 px-2 py-1 rounded">Cash</span>
+                                {% elif p[3] == "UPI" %}
+                                <span class="bg-purple-200 text-purple-800 px-2 py-1 rounded">UPI</span>
+                                {% else %}
+                                <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Bank</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ p[5] }}</td>
+                            <td>
+                                <a href="/edit_payment/{{ p[0] }}"
+                                    class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+                                    Edit
+                                </a>
+                            </td>
+
+
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let select = new TomSelect("#customerSelect", {
+                create: false,
+                sortField: { field: "text", direction: "asc" },
+                placeholder: "Search customer by name or phone...",
+                onChange: function (value) {
+                    if (value) {
+                        window.location.href = "/payments?customer_id=" + value;
+                    }
+                }
+            });
+
+            let selectedId = "{{ selected_customer_id or '' }}";
+
+            if (selectedId && select.getValue() !== selectedId) {
+                select.setValue(selectedId, true);
+            }
+
+            // Set hidden input
+            document.getElementById("hiddenCustomer").value = selectedId;
+
+        });
+
+        // VALIDATION
+        function validateCustomer() {
+
+            let val = document.getElementById("customerSelect").value;
+
+            if (!val) {
+                alert("⚠️ Please select a customer first!");
+                return false;
+            }
+
+            document.getElementById("hiddenCustomer").value = val;
+
+            return true;
+        }
+    </script>
+
+</body>
+
+</html>

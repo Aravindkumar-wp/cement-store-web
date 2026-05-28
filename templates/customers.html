@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Customers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li>
+                    <a href="/suppliers"
+                        class="block {{ 'font-bold text-yellow-300' if '/suppliers' in request.path else 'hover:text-gray-300' }}">
+                        🏭 Suppliers
+                    </a>
+                </li>
+                <li>
+                    <a href="/stock"
+                        class="block {{ 'font-bold text-yellow-300' if '/stock' in request.path else 'hover:text-gray-300' }}">
+                        📦 Stock
+                    </a>
+                </li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+
+            </ul>
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 p-6 ml-64">
+
+            <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
+
+                <h2 class="text-2xl font-bold mb-4">👥 Customers</h2>
+
+                <!-- Search -->
+                <form method="GET" class="mb-4 flex gap-2">
+                    <input type="text" name="search" placeholder="Search by name or phone"
+                        class="border p-2 rounded w-1/3">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
+                </form>
+
+                <!-- Table -->
+                <!-- Table -->
+                <table class="w-full border">
+                    <tr class="bg-gray-800 text-white">
+                        <th class="p-2">ID</th>
+                        <th class="p-2">Name</th>
+                        <th class="p-2">Phone</th>
+                        <th class="p-2">Address</th>
+                        <th class="p-2">Pending Amount</th>
+                        <th class="p-2">Actions</th>
+                    </tr>
+
+                    {% for c in customers %}
+                    <tr class="border hover:bg-gray-100">
+                        <td class="p-2">{{ c[0] }}</td>
+
+                        <td class="p-2">
+                            <a href="/customer/{{ c[0] }}" class="text-blue-600 font-semibold">
+                                {{ c[1] }}
+                            </a>
+                        </td>
+
+                        <td class="p-2">{{ c[2] }}</td>
+                        <td class="p-2">{{ c[3] }}</td>
+
+                        <td class="p-2 text-red-600 font-bold">
+                            ₹{{ c[4] }}
+                        </td>
+
+                        <td class="p-2 flex gap-2">
+
+                            <a href="/customer/{{ c[0] }}" class="bg-green-500 text-white px-3 py-1 rounded">
+                                View
+                            </a>
+
+                            <a href="/delete_customer/{{ c[0] }}" onclick="return confirm('Delete this customer?')"
+                                class="bg-red-500 text-white px-3 py-1 rounded">
+                                Delete
+                            </a>
+
+                            <a href="/edit_customer/{{ c[0] }}" class="bg-yellow-500 text-white px-3 py-1 rounded">
+                                Edit
+                            </a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

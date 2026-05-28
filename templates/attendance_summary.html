@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Monthly Attendance Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- ✅ SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+
+            </ul>
+
+        </div>
+
+        <!-- ✅ MAIN -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">📊 Monthly Attendance Summary</h1>
+
+            <!-- 🔥 CONTROL BAR -->
+            <div class="bg-white p-4 rounded-xl shadow mb-5 flex flex-wrap gap-3 items-center">
+
+                <form method="GET" action="/attendance_summary" id="monthForm" class="flex gap-3 items-center">
+
+                    <input type="month" name="month" value="{{ month }}" class="border p-2 rounded"
+                        onchange="document.getElementById('monthForm').submit()">
+
+                </form>
+
+                <a href="/attendance" class="bg-gray-600 text-white px-4 py-2 rounded">
+                    📋 View Attendance
+                </a>
+
+                <form method="GET" action="/download_salary_report" class="flex gap-2 items-center">
+
+                    <input type="month" name="month" required class="border p-2 rounded">
+
+                    <button class="bg-green-600 text-white px-4 py-2 rounded">
+                        ⬇️ Download Salary Report
+                    </button>
+
+                </form>
+
+                <a href="/update_salary" class="bg-blue-600 text-white px-4 py-2 rounded">
+                    ✏️ Update Salary
+                </a>
+
+
+
+            </div>
+
+            <!-- 🔥 SUMMARY CARDS -->
+            <div class="grid grid-cols-4 gap-5 mb-6">
+
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Workers</p>
+                    <h2 class="text-2xl font-bold">{{ data|length }}</h2>
+                </div>
+
+                <div class="bg-green-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Present</p>
+                    <h2 class="text-2xl font-bold text-green-700">
+                        {{ data | sum(attribute='present') }}
+                    </h2>
+                </div>
+
+                <div class="bg-yellow-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Half Days</p>
+                    <h2 class="text-2xl font-bold text-yellow-700">
+                        {{ data | sum(attribute='half') }}
+                    </h2>
+                </div>
+
+                <div class="bg-red-100 p-4 rounded-xl shadow">
+                    <p class="text-gray-500">Total Absent</p>
+                    <h2 class="text-2xl font-bold text-red-600">
+                        {{ data | sum(attribute='absent') }}
+                    </h2>
+                </div>
+
+            </div>
+
+            <!-- 🔥 TABLE -->
+            <div class="bg-white p-6 rounded-xl shadow">
+
+                <h2 class="text-lg font-semibold mb-4">📋 Worker Summary</h2>
+
+                <table class="w-full bg-white shadow rounded-xl overflow-hidden">
+
+                    <thead class="bg-gray-200 text-left">
+                        <tr>
+                            <th class="p-3">Worker</th>
+                            <th class="p-3">Present</th>
+                            <th class="p-3">Half</th>
+                            <th class="p-3">Absent</th>
+                            <th class="p-3">Total Days</th>
+
+
+                            <th class="p-3">Total Salary</th>
+                            <th class="p-3">Advance</th>
+                            <th class="p-3">Final Salary</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for w in data %}
+                        <tr class="border-t">
+                            <td class="p-3 font-semibold">{{ w.name }}</td>
+                            <td class="p-3">{{ w.present }}</td>
+                            <td class="p-3">{{ w.half }}</td>
+                            <td class="p-3">{{ w.absent }}</td>
+                            <td class="p-3">{{ w.total_days }}</td>
+
+                            <td class="p-3 text-blue-600 font-bold">₹ {{ w.total_salary }}</td>
+                            <td class="p-3 text-red-500">₹ {{ w.advance }}</td>
+                            <td class="p-3 text-green-600 font-bold">₹ {{ w.salary }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

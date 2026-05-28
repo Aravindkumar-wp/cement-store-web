@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stock Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/">🏠 Dashboard</a></li>
+
+                <li>
+                    <a href="/customers" class="block hover:text-gray-300">👥 Customers</a>
+                </li>
+
+                <li>
+                    <a href="/search" class="block hover:text-gray-300">🔍 Search</a>
+                </li>
+
+                <li>
+                    <a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a>
+                </li>
+
+                <li>
+                    <a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a>
+                </li>
+
+                <li>
+                    <a href="/payments" class="block hover:text-gray-300">💳 Payments</a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a>
+                </li>
+
+
+
+
+
+                <li>
+                    <a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a>
+                </li>
+                <li>
+                    <a href="/attendance" class="block hover:text-gray-300"> 🧑‍🏭 Attendance</a>
+                </li>
+
+                <li>
+                    <a href="/worker_payments" class="block hover:text-gray-300"> 💸 Worker Advances</a>
+                </li>
+                <li><a href="/suppliers">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="text-yellow-300 font-bold">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 p-6 ml-64">
+
+            <h1 class="text-2xl font-bold mb-6">📦 Stock Management</h1>
+
+            <!-- ➕ ADD PRODUCT -->
+            <form method="POST" class="mb-6 flex gap-2">
+                <input type="hidden" name="form_type" value="add_product">
+
+                <input name="name" placeholder="New Product Name" class="border p-2 rounded w-64" required>
+
+                <button class="bg-green-600 text-white px-4 py-2 rounded">
+                    ➕ Add Product
+                </button>
+            </form>
+
+            <!-- ➕ ADD STOCK -->
+            <form method="POST" class="mb-6 flex gap-2">
+                <input type="hidden" name="form_type" value="add_stock">
+
+                <select name="product_id" class="border p-2 rounded" required>
+                    <option value="">Select Product</option>
+                    {% for p in products %}
+                    <option value="{{ p[0] }}">{{ p[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="number" name="added" placeholder="Quantity" class="border p-2 rounded" required>
+
+                <button class="bg-blue-600 text-white px-4 py-2 rounded">
+                    ➕ Add Stock
+                </button>
+            </form>
+
+            <!-- 📊 TABLE -->
+            <table class="w-full border">
+                <tr class="bg-gray-200">
+                    <th class="p-2">Product</th>
+                    <th class="p-2">Available Stock</th>
+                    <th class="p-2">Action</th>
+                </tr>
+
+                {% for p in products %}
+                <tr class="text-center border-t">
+
+                    <!-- PRODUCT NAME -->
+                    <td class="p-2">{{ p[1] }}</td>
+
+                    <!-- STOCK -->
+                    <td class="p-2">{{ p[2] }}</td>
+
+
+
+
+                    <!-- DELETE -->
+                    <td class="p-2">
+                        <a href="/delete_product/{{ p[0] }}" onclick="return confirm('Are you sure to delete?')"
+                            class="text-red-600">
+                            Delete
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

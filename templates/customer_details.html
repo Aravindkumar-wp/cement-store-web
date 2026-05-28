@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Customer Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR (SAME STYLE AS YOUR APP) -->
+        <div class="w-64 bg-blue-900 text-white min-h-screen p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 p-6">
+
+
+
+            <!-- HEADER -->
+            <h1 class="text-2xl font-bold mb-4">Customer Details</h1>
+
+            <!-- TOP CARD -->
+            <div class="bg-white p-6 rounded-xl shadow flex justify-between items-center mb-6">
+
+                <!-- LEFT: PROFILE -->
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl">
+                        👤
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-semibold">
+                            {{ customer[1] }}
+                            <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded ml-2">Active</span>
+                        </h2>
+
+                        <p class="text-sm text-gray-600">📞 {{ customer[2] or '-' }}</p>
+                        <p class="text-sm text-gray-600">📍 {{ customer[3] or '-' }}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- SUMMARY CARDS -->
+            <div class="grid grid-cols-3 gap-5 mb-6">
+
+                <div class="bg-white p-5 rounded-xl shadow">
+                    <p class="text-gray-500">Total Purchase</p>
+                    <h2 class="text-xl font-bold">₹{{ total }}</h2>
+                </div>
+
+                <div class="bg-green-100 p-5 rounded-xl shadow">
+                    <p class="text-gray-600">Total Paid</p>
+                    <h2 class="text-xl font-bold text-green-700">₹{{ paid }}</h2>
+                </div>
+
+                <div class="bg-red-100 p-5 rounded-xl shadow">
+                    <p class="text-gray-600">Total Pending</p>
+                    <h2 class="text-xl font-bold text-red-600">₹{{ pending }}</h2>
+                </div>
+
+            </div>
+
+            <!-- SALES HISTORY -->
+
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+
+                <h2 class="text-lg font-semibold mb-4">📦 Sales History</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+
+                        <tr class="bg-gray-800 text-white text-center">
+                            <th class="p-2">Items</th>
+                            <th>Total</th>
+                            <th>Sale Paid</th>
+                            <th>Sale Pending</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                            <th>Charges</th>
+                        </tr>
+
+                        {% for sale in sales %}
+                        <tr class="border hover:bg-gray-50 text-center">
+
+                            <!-- ITEMS -->
+                            <td class="p-2 font-medium">
+                                {% if sale[5] %}
+                                {% for item in sale[5].split(',') %}
+                                <div>{{ item }}</div>
+                                {% endfor %}
+                                {% else %}
+                                No Items
+                                {% endif %}
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td>₹{{ sale[1] }}</td>
+
+                            <!-- PAID -->
+                            <td class="text-green-600">₹{{ sale[2] }}</td>
+
+                            <!-- PENDING -->
+                            <td class="text-red-600">₹{{ sale[3] }}</td>
+
+                            <!-- DATE -->
+                            <td>{{ sale[4] }}</td>
+
+                            <!-- 🔥 NEW: CHARGES -->
+                            <td class="text-xs text-gray-600">
+                                Labour: ₹{{ sale[6] }}<br>
+                                Transport: ₹{{ sale[7] }}<br>
+
+                            </td>
+
+                            <!-- ACTION -->
+                            <td class="space-x-2">
+                                <a href="/edit_sale/{{ sale[0] }}"
+                                    class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+                                    Edit
+                                </a>
+
+
+
+                                <a href="/invoice/{{ sale[0] }}"
+                                    class="bg-green-600 text-white px-2 py-1 rounded text-xs">
+                                    🧾 Invoice
+                                </a>
+                            </td>
+
+                        </tr> {% endfor %}
+
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- PAYMENT HISTORY (NEW FEATURE) -->
+            <div class="bg-white p-6 rounded-xl shadow">
+
+                <h2 class="text-lg font-semibold mb-4">💰 Payment History</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+
+                        <tr class="bg-gray-800 text-white">
+                            <th class="p-2">Date</th>
+                            <th>Amount</th>
+                            <th>Mode</th>
+                            <th>Reference</th>
+                            <th>Notes</th>
+                        </tr>
+
+                        {% for p in payments %}
+                        <tr class="border hover:bg-gray-50 text-center">
+                            <td class="p-2">{{ p[4] }}</td>
+                            <td class="text-green-700 font-semibold">₹{{ p[0] }}</td>
+
+                            <td>
+                                {% if p[1] == "Cash" %}
+                                <span class="bg-green-200 text-green-800 px-2 py-1 rounded">Cash</span>
+                                {% elif p[1] == "UPI" %}
+                                <span class="bg-purple-200 text-purple-800 px-2 py-1 rounded">UPI</span>
+                                {% else %}
+                                <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Bank</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ p[2] or '-' }}</td>
+                            <td>{{ p[3] or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

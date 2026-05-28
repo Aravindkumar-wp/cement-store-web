@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Worker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">➕ Add Worker</h1>
+
+            <!-- FORM CARD -->
+            <div class="bg-white p-6 rounded-xl shadow w-full max-w-md">
+
+                <form method="POST" class="space-y-4">
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Worker Name</label>
+                        <input type="text" name="name"
+                            class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter worker name" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Phone (Optional)</label>
+                        <input type="text" name="phone"
+                            class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter phone number">
+                    </div>
+
+                    <!-- 🔥 ADD THIS SALARY FIELD -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Salary Per Day (₹)</label>
+                        <input type="number" name="salary"
+                            class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter daily salary" required>
+                    </div>
+
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold">
+                        Save Worker
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

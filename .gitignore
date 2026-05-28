@@ -1,0 +1,10 @@
+.env
+venv/
+__pycache__/
+
+*.db
+database.db
+cement.db
+YOUR_REAL_DB_NAME.db
+
+invoice_*.pdf

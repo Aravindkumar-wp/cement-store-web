@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 to-gray-200 h-screen flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-[420px]">
+
+        <!-- COMPANY NAME -->
+        <div class="text-center mb-6">
+
+            <h1 class="text-2xl font-extrabold text-blue-900 leading-snug">
+                SRI SAI DURGA TRADERS & DEVELOPERS
+            </h1>
+
+            <p class="text-gray-600 text-sm mt-2 font-semibold">
+                CEMENT, STEEL, HARDWARE & SANITARY
+            </p>
+
+        </div>
+
+        <!-- LOGIN TITLE -->
+        <h2 class="text-xl font-bold text-center mb-6">
+            🔐 Welcome Back
+        </h2>
+
+        <!-- ERROR -->
+        {% if error %}
+        <p class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">
+            {{ error }}
+        </p>
+        {% endif %}
+
+        <!-- LOGIN FORM -->
+        <form method="POST" autocomplete="off" class="space-y-4">
+
+            <input type="text" name="username" placeholder="Mobile Number" required autocomplete="off" autocorrect="off"
+                autocapitalize="off" spellcheck="false"
+                class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <input type="password" name="password" placeholder="Password" required autocomplete="new-password"
+                class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <button
+                class="w-full bg-blue-700 hover:bg-blue-800 text-white p-3 rounded-lg font-bold transition duration-200">
+                Login
+            </button>
+
+        </form>
+
+        <!-- FOOTER -->
+        <p class="text-center text-xs text-gray-500 mt-6">
+            Powered by SRI SAI DURGA TRADERS & DEVELOPERS
+        </p>
+
+    </div>
+
+</body>
+
+</html>

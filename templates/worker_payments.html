@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Worker Payments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- ✅ SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white min-h-screen p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+
+        <!-- ✅ MAIN CONTENT -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">💸 Worker Advance Payments</h1>
+
+            <!-- ✅ FORM -->
+            <div class="bg-white p-5 rounded-xl shadow mb-6 max-w-md">
+
+                <form method="POST" class="space-y-3">
+
+                    <select name="worker_id" class="w-full p-2 border rounded" required>
+                        <option value="">Select Worker</option>
+                        {% for w in workers %}
+                        <option value="{{ w[0] }}">{{ w[1] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="number" name="amount" placeholder="Amount (₹)" class="w-full p-2 border rounded"
+                        required>
+
+                    <input type="text" name="note" placeholder="Note (optional)" class="w-full p-2 border rounded">
+
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+                        Save Payment
+                    </button>
+
+                </form>
+            </div>
+
+            <!-- ✅ PAYMENT HISTORY -->
+            <div class="bg-white p-5 rounded-xl shadow">
+
+                <h2 class="font-semibold mb-3">📜 Payment History</h2>
+
+                <table class="w-full border">
+
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2 text-left">Worker</th>
+                            <th class="p-2 text-left">Amount</th>
+                            <th class="p-2 text-left">Note</th>
+                            <th class="p-2 text-left">Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for p in payments %}
+                        <tr class="border-t">
+                            <td class="p-2">{{ p[0] }}</td>
+                            <td class="p-2 text-red-600">₹ {{ p[1] }}</td>
+                            <td class="p-2">{{ p[2] }}</td>
+                            <td class="p-2">{{ p[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

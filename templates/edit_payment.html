@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Payment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block font-bold text-yellow-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 ml-64 p-8">
+
+            <h1 class="text-2xl font-bold mb-6">✏️ Edit Payment</h1>
+
+            <p class="mb-4 text-gray-600">
+                Customer: <b>{{ payment[7] }}</b>
+            </p>
+
+            <form method="POST" class="bg-white p-6 rounded-xl shadow max-w-md space-y-4">
+
+                <div>
+                    <label>Amount</label>
+                    <input type="number" name="amount" value="{{ payment[2] }}" class="w-full p-2 border rounded"
+                        required>
+                </div>
+
+                <div>
+                    <label>Mode</label>
+                    <select name="mode" class="w-full p-2 border rounded">
+                        <option {% if payment[3]=="Cash" %}selected{% endif %}>Cash</option>
+                        <option {% if payment[3]=="UPI" %}selected{% endif %}>UPI</option>
+                        <option {% if payment[3]=="Bank" %}selected{% endif %}>Bank</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Reference</label>
+                    <input type="text" name="reference" value="{{ payment[4] }}" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>Notes</label>
+                    <input type="text" name="notes" value="{{ payment[5] }}" class="w-full p-2 border rounded">
+                </div>
+
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full">
+                    Update Payment
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

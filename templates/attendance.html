@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+
+                <li>
+                    <a href="/"
+                        class="block {{ 'font-bold text-yellow-300' if request.path == '/' else 'hover:text-gray-300' }}">
+                        🏠 Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/customers' in request.path or '/customer/' in request.path else 'hover:text-gray-300' }}">
+                        👥 Customers
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/search"
+                        class="block {{ 'font-bold text-yellow-300' if '/search' in request.path else 'hover:text-gray-300' }}">
+                        🔍 Search
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_customer"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_customer' in request.path else 'hover:text-gray-300' }}">
+                        ➕ Add Customer
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/add_sale"
+                        class="block {{ 'font-bold text-yellow-300' if '/add_sale' in request.path else 'hover:text-gray-300' }}">
+                        💰 Add Sale
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/payments' in request.path else 'hover:text-gray-300' }}">
+                        💳 Payments
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers"
+                        class="block {{ 'font-bold text-yellow-300' if '/upload_customers' in request.path else 'hover:text-gray-300' }}">
+                        📂 Upload Excel
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/download_report"
+                        class="block {{ 'font-bold text-yellow-300' if '/download_report' in request.path else 'hover:text-gray-300' }}">
+                        ⬇️ Download Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/attendance"
+                        class="block {{ 'font-bold text-yellow-300' if '/attendance' in request.path else 'hover:text-gray-300' }}">
+                        🧑‍🏭 Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="/worker_payments"
+                        class="block {{ 'font-bold text-yellow-300' if '/worker_payments' in request.path else 'hover:text-gray-300' }}">
+                        💸 Worker Advances
+                    </a>
+                </li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 ml-64 p-6">
+
+            <h1 class="text-2xl font-bold mb-6">🧑‍🏭 Attendance Dashboard</h1>
+
+            <!-- 🔥 CARDS -->
+            <div class="grid grid-cols-4 gap-5 mb-6">
+
+                <a href="/attendance?filter=all" class="bg-white p-4 rounded-xl shadow hover:shadow-lg">
+                    <p>Total Employees</p>
+                    <h2 class="text-2xl font-bold">{{ total_workers }}</h2>
+                </a>
+
+                <a href="/attendance?filter=present" class="bg-green-100 p-4 rounded-xl shadow hover:shadow-lg">
+                    <p>Present</p>
+                    <h2 class="text-2xl font-bold text-green-700">{{ present }}</h2>
+                </a>
+
+                <a href="/attendance?filter=absent" class="bg-red-100 p-4 rounded-xl shadow hover:shadow-lg">
+                    <p>Absent</p>
+                    <h2 class="text-2xl font-bold text-red-600">{{ absent }}</h2>
+                </a>
+
+                <a href="/attendance?filter=half" class="bg-yellow-100 p-4 rounded-xl shadow hover:shadow-lg">
+                    <p>Half Day</p>
+                    <h2 class="text-2xl font-bold text-yellow-600">{{ half }}</h2>
+                </a>
+
+            </div>
+
+            <!-- 🔥 CONTROL BAR -->
+            <div class="bg-white p-4 rounded-xl shadow mb-5 flex flex-wrap gap-3 items-center">
+
+                <form method="GET" action="/attendance" id="filterForm" class="flex gap-3 items-center">
+
+                    <!-- DATE -->
+                    <input type="date" name="date" value="{{ selected_date }}" class="border p-2 rounded"
+                        onchange="document.getElementById('filterForm').submit()">
+
+                    <!-- FILTER -->
+                    <select name="filter" class="border p-2 rounded"
+                        onchange="document.getElementById('filterForm').submit()">
+
+
+                        <option value="all" {{ 'selected' if filter_type=='all' else '' }}>All Employees</option>
+                        <option value="present" {{ 'selected' if filter_type=='present' else '' }}>Present</option>
+                        <option value="absent" {{ 'selected' if filter_type=='absent' else '' }}>Absent</option>
+                        <option value="half" {{ 'selected' if filter_type=='half' else '' }}>Half Day</option>
+
+                    </select>
+
+                </form>
+
+                <!-- BUTTONS -->
+                <a href="/add_worker" class="bg-blue-600 text-white px-4 py-2 rounded">
+                    + Add Worker
+                </a>
+
+                <a href="/mark_attendance" class="bg-green-600 text-white px-4 py-2 rounded">
+                    ✔ Mark Attendance
+                </a>
+
+                <a href="/attendance_summary" class="bg-gray-600 text-white px-4 py-2 rounded">
+                    📊 Monthly Report
+                </a>
+
+            </div>
+
+            <!-- 🔥 TABLE -->
+            <div class="bg-white p-6 rounded-xl shadow">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    📋 {{ filter_type|capitalize }} Attendance
+                </h2>
+
+                <table class="w-full text-sm">
+                    <tr class="bg-gray-800 text-white">
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+
+                    {% for row in data %}
+                    <tr class="border text-center hover:bg-gray-50">
+
+                        <td>{{ loop.index }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] or '-' }}</td>
+                        <td>{{ row[3] or '-' }}</td>
+
+                        <td>
+                            {% if row[4] == 'Present' %}
+                            <span class="bg-green-200 text-green-800 px-2 py-1 rounded">Present</span>
+                            {% elif row[4] == 'Absent' %}
+                            <span class="bg-red-200 text-red-800 px-2 py-1 rounded">Absent</span>
+                            {% else %}
+                            <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded">Half</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ row[5] }}</td>
+
+                        <td>
+                            <a href="/edit_attendance/{{ row[0] }}"
+                                class="bg-blue-500 text-white px-2 py-1 rounded">Edit</a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

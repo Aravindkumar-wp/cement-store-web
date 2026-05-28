@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ title or "Cement Store" }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+    <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+    <ul class="space-y-3 text-sm">
+
+        <li>
+            <a href="/" class="block 
+               {% if request.path == '/' %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                🏠 Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="/customers"
+                class="block 
+               {% if '/customers' in request.path or '/customer/' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                👥 Customers
+            </a>
+        </li>
+
+        <li>
+            <a href="/search"
+                class="block 
+               {% if '/search' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                🔍 Search
+            </a>
+        </li>
+
+        <li>
+            <a href="/add_customer"
+                class="block 
+               {% if '/add_customer' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                ➕ Add Customer
+            </a>
+        </li>
+
+        <li>
+            <a href="/add_sale"
+                class="block 
+               {% if '/add_sale' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                💰 Add Sale
+            </a>
+        </li>
+
+        <li>
+            <a href="/payments"
+                class="block 
+               {% if '/payments' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                💳 Payments
+            </a>
+        </li>
+
+        <li>
+            <a href="/upload_customers"
+                class="block 
+               {% if '/upload_customers' in request.path %} font-bold text-yellow-300 {% else %} hover:text-gray-300 {% endif %}">
+                📂 Upload Excel
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+</html>

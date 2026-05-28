@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Sale</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+    <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block hover:text-gray-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block font-bold text-yellow-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li><a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a></li>
+                <li><a href="/attendance" class="block hover:text-gray-300">🧑‍🏭 Attendance</a></li>
+                <li><a href="/worker_payments" class="block hover:text-gray-300">💸 Worker Advances</a></li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 p-6 ml-64">
+
+            <h1 class="text-2xl font-bold mb-6">💰 Add Sale</h1>
+
+            <div class="bg-white p-6 rounded-xl shadow w-full max-w-3xl">
+
+                <form method="POST" class="space-y-4">
+
+                    <!-- CUSTOMER -->
+                    <div>
+                        <label class="text-sm font-medium">Select Customer</label>
+                        <select name="customer_id" id="customerSelect" class="w-full p-2 border rounded mt-1" required>
+                            <option value="">Search customer...</option>
+                            {% for c in customers %}
+                            <option value="{{ c[0] }}">
+                                {{ c[1] }} | 📞 {{ c[2] or 'No Phone' }} | 📍 {{ c[3] or '-' }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <label class="block font-semibold mb-1">Sale Date</label>
+                    <input type="date" name="sale_date" class="border p-2 rounded w-full mb-4">
+                    <!-- HEADER -->
+                    <div class="grid grid-cols-5 gap-2 font-semibold mt-4">
+                        <div>Product</div>
+                        <div>Qty</div>
+                        <div>Price</div>
+                        <div>Amount</div>
+                        <div>Action</div>
+                    </div>
+
+                    <!-- ITEMS -->
+                    <div id="items">
+
+                        <div class="grid grid-cols-5 gap-2 mb-2 item-row">
+
+                            <!-- 🔥 PRODUCT SELECT -->
+                            <select name="product_id[]" class="border p-2 productSelect" required>
+                                <option value="">Select product...</option>
+                                {% for p in products %}
+                                <option value="{{ p[0] }}">{{ p[1] }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <input name="qty[]" type="number" class="border p-2 w-full qty" required>
+                            <input name="price[]" type="number" class="border p-2 w-full price" required>
+
+                            <input name="amount[]" type="number" class="border p-2 w-full amount bg-gray-100" readonly>
+
+                            <button type="button" onclick="removeRow(this)" class="text-red-600">X</button>
+
+                        </div>
+
+                    </div>
+
+                    <button type="button" onclick="addRow()" class="bg-blue-600 text-white px-3 py-1 rounded">
+                        + Add Item
+                    </button>
+
+                    <!-- CHARGES -->
+                    <div>
+                        <label>Labour Charge</label>
+                        <input type="number" id="labour" name="labour" value="0" class="w-full p-2 border rounded">
+                    </div>
+
+                    <div>
+                        <label>Transport Charge</label>
+                        <input type="number" id="transport" name="transport" value="0"
+                            class="w-full p-2 border rounded">
+                    </div>
+
+
+
+                    <!-- TOTAL -->
+                    <div>
+                        <label>Total Amount</label>
+                        <input type="number" id="total" class="w-full p-2 border rounded bg-gray-100" readonly>
+                    </div>
+
+                    <!-- PAID -->
+                    <div>
+                        <label>Paid Amount</label>
+                        <input type="number" id="paid" name="paid" class="w-full p-2 border rounded">
+                    </div>
+
+                    <!-- PENDING -->
+                    <div>
+                        <label>Pending Amount</label>
+                        <input type="number" id="pending" class="w-full p-2 border rounded bg-gray-100" readonly>
+                    </div>
+
+                    <button class="bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded-lg">
+                        Save Sale
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            new TomSelect("#customerSelect");
+
+            function initProductSelect(select) {
+                new TomSelect(select);
+            }
+
+            document.querySelectorAll(".productSelect").forEach(initProductSelect);
+
+            document.addEventListener("input", function (e) {
+                if (
+                    e.target.classList.contains("qty") ||
+                    e.target.classList.contains("price") ||
+                    e.target.id === "labour" ||
+                    e.target.id === "transport" ||
+
+                    e.target.id === "paid"
+                ) {
+                    calculateTotal();
+                }
+            });
+
+            window.addRow = function () {
+                const row = document.createElement("div");
+                row.className = "grid grid-cols-5 gap-2 mb-2 item-row";
+
+                row.innerHTML = `
+        <select name="product_id[]" class="border p-2 productSelect" required>
+            <option value="">Select product...</option>
+            {% for p in products %}
+            <option value="{{ p[0] }}">{{ p[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <input name="qty[]" type="number" class="border p-2 w-full qty" required>
+        <input name="price[]" type="number" class="border p-2 w-full price" required>
+        <input name="amount[]" type="number" class="border p-2 w-full amount bg-gray-100" readonly>
+        <button type="button" onclick="removeRow(this)" class="text-red-600">X</button>
+        `;
+
+                document.getElementById("items").appendChild(row);
+
+                initProductSelect(row.querySelector(".productSelect"));
+            }
+
+            window.removeRow = function (btn) {
+                btn.parentElement.remove();
+                calculateTotal();
+            }
+
+            window.calculateTotal = function () {
+                let total = 0;
+
+                document.querySelectorAll(".item-row").forEach(row => {
+                    const qty = parseFloat(row.querySelector(".qty").value) || 0;
+                    const price = parseFloat(row.querySelector(".price").value) || 0;
+
+                    const amount = qty * price;
+                    row.querySelector(".amount").value = amount;
+
+                    total += amount;
+                });
+
+                total += parseFloat(document.getElementById("labour").value) || 0;
+                total += parseFloat(document.getElementById("transport").value) || 0;
+
+
+                document.getElementById("total").value = total;
+
+                let paid = parseFloat(document.getElementById("paid").value) || 0;
+                document.getElementById("pending").value = total - paid;
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>

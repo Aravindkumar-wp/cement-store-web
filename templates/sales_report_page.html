@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+    <a href="/" class="text-blue-600">← Back to Dashboard</a>
+
+    <h1 class="text-3xl font-bold my-6">{{ title }}</h1>
+
+    <div class="bg-white rounded-xl shadow p-5">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 text-left">ID</th>
+                    <th class="p-3 text-left">Customer</th>
+                    <th class="p-3 text-left">Items</th>
+                    <th class="p-3 text-left">Qty</th>
+                    <th class="p-3 text-left">Total</th>
+                    <th class="p-3 text-left">Paid</th>
+                    <th class="p-3 text-left">Pending</th>
+                    <th class="p-3 text-left">Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in data %}
+                <tr class="border-b">
+                    <td class="p-3">{{ r[0] }}</td>
+                    <td class="p-3">{{ r[1] }}</td>
+                    <td class="p-3">{{ r[2] }}</td>
+                    <td class="p-3">{{ r[3] }}</td>
+                    <td class="p-3">₹{{ r[4] }}</td>
+                    <td class="p-3">₹{{ r[5] }}</td>
+                    <td class="p-3">₹{{ r[6] }}</td>
+                    <td class="p-3">{{ r[7] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

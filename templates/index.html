@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cement Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 p-5">
+
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li><a href="/" class="block font-bold text-yellow-300">🏠 Dashboard</a></li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block  text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li><a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a></li>
+                <li><a href="/attendance" class="block hover:text-gray-300">🧑‍🏭 Attendance</a></li>
+                <li><a href="/worker_payments" class="block hover:text-gray-300">💸 Worker Advances</a></li>
+                <li><a href="/suppliers" class="block hover:text-gray-300">🏭 Suppliers</a></li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="ml-64 flex-1 p-6">
+
+            <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+            <!-- DAILY -->
+            <div class="bg-white rounded-xl shadow p-5 mb-5">
+                <h2 class="font-bold mb-4">Daily Overview (Today)</h2>
+
+                <div class="grid grid-cols-3 gap-5">
+
+                    <a href="/today_sales" class="bg-blue-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-blue-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            💰</div>
+                        <div>
+                            <h3 class="font-semibold">Today's Sales</h3>
+                            <p class="text-2xl font-bold">₹ {{ today_sales }}</p>
+                            <p class="text-sm text-gray-500">{{ today_sales_count }} Transactions</p>
+                        </div>
+                    </a>
+
+                    <a href="/today_collections"
+                        class="bg-green-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-green-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            💳</div>
+                        <div>
+                            <h3 class="font-semibold">Today's Collections</h3>
+                            <p class="text-2xl font-bold">₹ {{ today_collections }}</p>
+                            <p class="text-sm text-gray-500">{{ today_collections_count }} Payments</p>
+                        </div>
+                    </a>
+
+                    <a href="/today_pending"
+                        class="bg-orange-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-orange-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            ⚠️</div>
+                        <div>
+                            <h3 class="font-semibold">Today's Pending</h3>
+                            <p class="text-2xl font-bold">₹ {{ today_pending }}</p>
+                            <p class="text-sm text-gray-500">{{ today_pending_count }} Transactions</p>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- MONTHLY -->
+            <div class="bg-white rounded-xl shadow p-5 mb-5">
+                <h2 class="font-bold mb-4">Monthly Overview (This Month)</h2>
+
+                <div class="grid grid-cols-3 gap-5">
+
+                    <a href="/monthly_sales" class="bg-blue-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-blue-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            📊</div>
+                        <div>
+                            <h3 class="font-semibold">Monthly Sales</h3>
+                            <p class="text-2xl font-bold">₹ {{ monthly_sales }}</p>
+                            <p class="text-sm text-gray-500">{{ monthly_sales_count }} Transactions</p>
+                        </div>
+                    </a>
+
+                    <a href="/monthly_collections"
+                        class="bg-green-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-green-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            💼</div>
+                        <div>
+                            <h3 class="font-semibold">Monthly Collections</h3>
+                            <p class="text-2xl font-bold">₹ {{ monthly_collections }}</p>
+                            <p class="text-sm text-gray-500">{{ monthly_collections_count }} Payments</p>
+                        </div>
+                    </a>
+
+                    <a href="/monthly_pending"
+                        class="bg-orange-50 hover:scale-[1.02] transition rounded-xl p-5 flex gap-5">
+                        <div
+                            class="bg-orange-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl">
+                            🕒</div>
+                        <div>
+                            <h3 class="font-semibold">Monthly Pending</h3>
+                            <p class="text-2xl font-bold">₹ {{ monthly_pending }}</p>
+                            <p class="text-sm text-gray-500">{{ monthly_pending_count }} Transactions</p>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- OVERALL -->
+            <div class="bg-white rounded-xl shadow p-5 mb-5">
+                <h2 class="font-bold mb-4">Overall Summary</h2>
+
+                <div class="grid grid-cols-4 gap-5">
+
+                    <a href="/customers" class="bg-purple-50 hover:scale-[1.02] transition rounded-xl p-5">
+                        <h3>Total Customers</h3>
+                        <p class="text-2xl font-bold">{{ total_customers }}</p>
+                        <p class="text-sm text-gray-500">All Time</p>
+                    </a>
+
+                    <a href="/all_sales" class="bg-blue-50 hover:scale-[1.02] transition rounded-xl p-5">
+                        <h3>Total Sales</h3>
+                        <p class="text-2xl font-bold">₹ {{ total_sales }}</p>
+                        <p class="text-sm text-gray-500">All Time</p>
+                    </a>
+
+                    <a href="/all_collections" class="bg-green-50 hover:scale-[1.02] transition rounded-xl p-5">
+                        <h3>Total Collections</h3>
+                        <p class="text-2xl font-bold">₹ {{ total_collections }}</p>
+                        <p class="text-sm text-gray-500">All Time</p>
+                    </a>
+
+                    <a href="/all_pending" class="bg-red-50 hover:scale-[1.02] transition rounded-xl p-5">
+                        <h3>Total Pending</h3>
+                        <p class="text-2xl font-bold">₹ {{ total_pending }}</p>
+                        <p class="text-sm text-gray-500">All Time</p>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- SMALL CHARTS -->
+            <div class="grid grid-cols-3 gap-5 mb-5">
+
+                <div class="bg-white rounded-xl shadow p-4 col-span-2">
+                    <h2 class="font-bold mb-3 text-sm">Sales & Collections Trend</h2>
+                    <div class="h-56">
+                        <canvas id="salesCollectionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="font-bold mb-3 text-sm">Pending Aging Chart</h2>
+                    <div class="h-56">
+                        <canvas id="pendingChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="bg-white rounded-xl shadow p-5">
+                <h2 class="font-bold mb-4">Quick Actions</h2>
+
+                <div class="grid grid-cols-6 gap-4 text-sm">
+
+                    <a href="/add_sale"
+                        class="bg-blue-50 text-blue-700 p-4 rounded-xl text-center font-semibold hover:bg-blue-100">
+                        ➕ Add Sale
+                    </a>
+
+                    <a href="/payments"
+                        class="bg-green-50 text-green-700 p-4 rounded-xl text-center font-semibold hover:bg-green-100">
+                        💳 Add Payment
+                    </a>
+
+                    <a href="/add_customer"
+                        class="bg-purple-50 text-purple-700 p-4 rounded-xl text-center font-semibold hover:bg-purple-100">
+                        👤 Add Customer
+                    </a>
+
+                    <a href="/customers"
+                        class="bg-indigo-50 text-indigo-700 p-4 rounded-xl text-center font-semibold hover:bg-indigo-100">
+                        👥 View Customers
+                    </a>
+
+                    <a href="/search"
+                        class="bg-slate-100 text-slate-700 p-4 rounded-xl text-center font-semibold hover:bg-slate-200">
+                        🔍 Search Customer
+                    </a>
+
+                    <a href="/stock"
+                        class="bg-orange-50 text-orange-700 p-4 rounded-xl text-center font-semibold hover:bg-orange-100">
+                        📦 Stock
+                    </a>
+
+                    <a href="/attendance"
+                        class="bg-cyan-50 text-cyan-700 p-4 rounded-xl text-center font-semibold hover:bg-cyan-100">
+                        📅 Attendance
+                    </a>
+
+                    <a href="/mark_attendance"
+                        class="bg-teal-50 text-teal-700 p-4 rounded-xl text-center font-semibold hover:bg-teal-100">
+                        🧑‍🏭 Mark Attendance
+                    </a>
+
+                    <a href="/worker_payments"
+                        class="bg-lime-50 text-lime-700 p-4 rounded-xl text-center font-semibold hover:bg-lime-100">
+                        💸 Worker Advances
+                    </a>
+
+                    <a href="/suppliers"
+                        class="bg-yellow-50 text-yellow-700 p-4 rounded-xl text-center font-semibold hover:bg-yellow-100">
+                        🏭 Suppliers
+                    </a>
+
+                    <a href="/diesel"
+                        class="bg-amber-50 text-amber-700 p-4 rounded-xl text-center font-semibold hover:bg-amber-100">
+                        ⛽ Diesel
+                    </a>
+
+                    <a href="/expense_report"
+                        class="bg-red-50 text-red-700 p-4 rounded-xl text-center font-semibold hover:bg-red-100">
+                        📊 Labour & Transport Report
+                    </a>
+
+                    <a href="/download_report"
+                        class="bg-gray-100 text-gray-700 p-4 rounded-xl text-center font-semibold hover:bg-gray-200">
+                        ⬇️ Reports
+                    </a>
+
+                    <a href="/upload_customers"
+                        class="bg-pink-50 text-pink-700 p-4 rounded-xl text-center font-semibold hover:bg-pink-100">
+                        📂 Upload Excel
+                    </a>
+
+                    <a href="/today_sales"
+                        class="bg-blue-50 text-blue-700 p-4 rounded-xl text-center font-semibold hover:bg-blue-100">
+                        📌 Today Sales
+                    </a>
+
+                    <a href="/today_pending"
+                        class="bg-orange-50 text-orange-700 p-4 rounded-xl text-center font-semibold hover:bg-orange-100">
+                        ⚠️ Today Pending
+                    </a>
+
+                    <a href="/all_pending"
+                        class="bg-red-50 text-red-700 p-4 rounded-xl text-center font-semibold hover:bg-red-100">
+                        🔴 All Pending
+                    </a>
+
+                    <a href="/all_collections"
+                        class="bg-green-50 text-green-700 p-4 rounded-xl text-center font-semibold hover:bg-green-100">
+                        ✅ All Collections
+                    </a>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const salesLabels = {{ sales_labels | tojson }};
+        const salesValues = {{ sales_values | tojson }};
+        const collectionLabels = {{ collection_labels | tojson }};
+        const collectionValues = {{ collection_values | tojson }};
+
+        new Chart(document.getElementById("salesCollectionChart"), {
+            type: "line",
+            data: {
+                labels: salesLabels.length ? salesLabels : collectionLabels,
+                datasets: [
+                    {
+                        label: "Sales",
+                        data: salesValues,
+                        borderColor: "#2563eb",
+                        backgroundColor: "rgba(37,99,235,0.12)",
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: "Collections",
+                        data: collectionValues,
+                        borderColor: "#16a34a",
+                        backgroundColor: "rgba(22,163,74,0.12)",
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById("pendingChart"), {
+            type: "doughnut",
+            data: {
+                labels: ["0-30 Days", "31-60 Days", "61-90 Days", "90+ Days"],
+                datasets: [{
+                    data: [
+                        {{ total_pending * 0.40 }},
+                {{ total_pending * 0.25 }},
+                    {{ total_pending * 0.20 }},
+            {{ total_pending * 0.15 }}
+                ],
+            backgroundColor: ["#2563eb", "#22c55e", "#f97316", "#ef4444"]
+            }]
+        },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "65%"
+        }
+    });
+    </script>
+
+</body>
+
+</html>

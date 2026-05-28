@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Suppliers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-blue-900 text-white h-screen fixed p-5">
+            <h2 class="text-xl font-bold mb-6">Cement Store</h2>
+
+            <ul class="space-y-3 text-sm">
+                <li>
+                    <a href="/" class="block hover:text-gray-300">🏠 Dashboard</a>
+                </li>
+
+                <li>
+                    <a href="/customers" class="block hover:text-gray-300">👥 Customers</a>
+                </li>
+
+                <li>
+                    <a href="/search" class="block hover:text-gray-300">🔍 Search</a>
+                </li>
+
+                <li>
+                    <a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a>
+                </li>
+
+                <li>
+                    <a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a>
+                </li>
+
+                <li>
+                    <a href="/payments" class="block hover:text-gray-300">💳 Payments</a>
+                </li>
+
+                <li>
+                    <a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a>
+                </li>
+
+                <li>
+                    <a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a>
+                </li>
+                <li>
+                    <a href="/attendance" class="block hover:text-gray-300"> 🧑‍🏭 Attendance</a>
+                </li>
+
+                <li>
+                    <a href="/worker_payments" class="block hover:text-gray-300"> 💸 Worker Advances</a>
+                </li>
+                <li>
+                    <a href="/suppliers" class="block font-bold text-yellow-300">🏭 Suppliers</a>
+                </li>
+                <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/expense_report" class="block hover:text-gray-300">📊 Labour & Transport Report</a></li>
+                <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="ml-64 p-6 w-full">
+
+            <h1 class="text-2xl font-bold mb-6">🏭 Suppliers Dashboard</h1>
+
+            <!-- 🔥 SUMMARY CARDS -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                {% set total_purchase = summary | sum(attribute=1) %}
+                {% set total_paid = summary | sum(attribute=4) %}
+                {% set total_pending = summary | sum(attribute=5) %}
+
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="text-gray-500">Total Purchase</h3>
+                    <p class="text-xl font-bold">₹ {{ total_purchase }}</p>
+                </div>
+
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="text-gray-500">Total Paid</h3>
+                    <p class="text-xl font-bold text-green-600">₹ {{ total_paid }}</p>
+                </div>
+
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="text-gray-500">Total Pending</h3>
+                    <p class="text-xl font-bold text-red-600">₹ {{ total_pending }}</p>
+                </div>
+            </div>
+
+            <!-- ADD SUPPLIER -->
+            <div class="bg-white p-4 rounded shadow mb-6">
+                <h2 class="font-semibold mb-3">➕ Add Supplier</h2>
+
+                <form method="POST" class="flex gap-3">
+                    <input type="hidden" name="form_type" value="add_supplier">
+
+                    <input name="name" required placeholder="Supplier Name" class="border p-2 rounded w-full">
+
+                    <input name="phone" placeholder="Phone" class="border p-2 rounded w-full">
+
+                    <button class="bg-blue-600 text-white px-4 rounded">
+                        Add
+                    </button>
+                </form>
+            </div>
+
+            <!-- ADD PURCHASE -->
+            <div class="bg-white p-4 rounded shadow mb-6">
+                <h2 class="font-semibold mb-3">➕ Add Purchase</h2>
+
+                <form method="POST" class="flex gap-3">
+                    <input type="hidden" name="form_type" value="add_purchase">
+
+                    <select name="supplier_id" class="border p-2 rounded">
+                        {% for s in suppliers %}
+                        <option value="{{ s[0] }}">{{ s[1] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input name="total" type="number" required placeholder="Total" class="border p-2 rounded">
+
+                    <input name="paid" type="number" required placeholder="Paid" class="border p-2 rounded">
+
+                    <button class="bg-green-600 text-white px-4 rounded">
+                        Save
+                    </button>
+                </form>
+            </div>
+
+            <!-- PURCHASE TABLE -->
+            <div class="bg-white p-4 rounded shadow mb-6">
+                <h2 class="font-semibold mb-3">📦 Purchases History</h2>
+
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">Supplier</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Pending</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for p in purchases %}
+                        <tr class="border-t hover:bg-gray-50">
+                            <td class="p-2">{{ p[1] }}</td>
+                            <td>₹ {{ p[2] }}</td>
+                            <td>₹ {{ p[3] }}</td>
+                            <td class="text-red-600">₹ {{ p[4] }}</td>
+                            <td>{{ p[5] }}</td>
+
+                            <td class="flex gap-2">
+                                <a href="/edit_purchase/{{ p[0] }}"
+                                    class="bg-blue-500 text-white px-2 py-1 rounded text-xs">Edit</a>
+
+                                <a href="/delete_purchase/{{ p[0] }}" onclick="return confirm('Delete this purchase?')"
+                                    class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div class="bg-white p-4 rounded shadow mb-6">
+                <h2 class="font-semibold mb-3">💳 Supplier Payments</h2>
+
+                <form method="POST" class="flex gap-3 mb-4">
+                    <input type="hidden" name="form_type" value="add_payment">
+
+                    <select name="supplier_id" class="border p-2 rounded">
+                        {% for s in suppliers %}
+                        <option value="{{ s[0] }}">{{ s[1] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input name="amount" type="number" required placeholder="Amount" class="border p-2 rounded">
+                    <input type="text" name="note" placeholder="Note" class="border p-2 rounded">
+                    <button class="bg-purple-600 text-white px-4 rounded">
+                        Pay
+                    </button>
+                </form>
+
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">Supplier</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Note</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for p in payments %}
+                        <tr class="border-t hover:bg-gray-50">
+                            <td class="p-2">{{ p[1] }}</td>
+                            <td>₹ {{ p[2] }}</td>
+                            <td>{{ p[3] }}</td>
+                            <td>{{ p[4] }}</td>
+
+                            <td class="flex gap-2">
+                                <a href="/edit_supplier_payment/{{ p[0] }}"
+                                    class="bg-blue-500 text-white px-2 py-1 rounded text-xs">Edit</a>
+
+                                <a href="/delete_supplier_payment/{{ p[0] }}"
+                                    onclick="return confirm('Delete this payment?')"
+                                    class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SUPPLIER SUMMARY TABLE -->
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="font-semibold mb-3">📊 Supplier Summary</h2>
+
+                <table class="w-full">
+                    <tr class="bg-gray-200">
+                        <th class="p-2">Supplier</th>
+                        <th>Total Purchase</th>
+                        <th>Paid (Purchase)</th>
+                        <th>Paid (Payments)</th>
+                        <th>Total Paid</th>
+                        <th>Pending</th>
+                    </tr>
+
+                    {% for s in summary %}
+                    <tr class="border-t">
+                        <td class="p-2">{{ s[0] }}</td>
+                        <td>₹ {{ s[1] }}</td>
+                        <td class="text-blue-600">₹ {{ s[2] }}</td>
+                        <td class="text-purple-600">₹ {{ s[3] }}</td>
+                        <td class="text-green-600 font-bold">₹ {{ s[4] }}</td>
+                        <td class="text-red-600">₹ {{ s[5] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
