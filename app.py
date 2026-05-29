@@ -642,86 +642,106 @@ def add_sale():
 @app.route("/upload_customers", methods=["GET", "POST"])
 @login_required
 def upload_customers():
+    from openpyxl import load_workbook
+    from psycopg2.extras import execute_values
+
     conn = connect_db()
     cursor = conn.cursor()
 
-    if request.method == "POST":
-        file = request.files["file"]
-        if not file:
-            release_conn(conn)
-            return redirect("/upload_customers")
+    try:
+        if request.method == "POST":
+            file = request.files.get("file")
 
-        filename = file.filename
-        df = pd.read_excel(file)
+            if not file or file.filename == "":
+                release_conn(conn)
+                return redirect("/upload_customers")
 
-        df.columns = (
-            df.columns.astype(str)
-            .str.strip()
-            .str.replace("\n", " ", regex=False)
-            .str.replace("\xa0", " ", regex=False)
-            .str.upper()
-        )
+            filename = file.filename
 
-        def get_value(row, possible_names, default=""):
-            for col in possible_names:
-                col = col.strip().upper()
-                if col in df.columns:
-                    return row.get(col, default)
-            return default
+            cursor.execute("""
+                INSERT INTO uploads (filename, total_records, status, date)
+                VALUES (%s, %s, %s, CURRENT_DATE::TEXT)
+                RETURNING id
+            """, (filename, 0, "Processing"))
 
-        # FIX: DATE('now') → CURRENT_DATE::TEXT
-        cursor.execute("""
-            INSERT INTO uploads (filename, total_records, status, date)
-            VALUES (%s, %s, %s, CURRENT_DATE::TEXT)
-            RETURNING id
-        """, (filename, 0, "Processing"))
-        upload_id = cursor.fetchone()[0]
+            upload_id = cursor.fetchone()[0]
 
-        inserted = 0
+            wb = load_workbook(file, read_only=True, data_only=True)
+            ws = wb.active
 
-        for _, row in df.iterrows():
-            name = get_value(row, ["NAME OF THE CONSUMER","NAME","CUSTOMER NAME","CONSUMER NAME"])
-            phone = get_value(row, ["MOBILE NO","MOBILE","PHONE","PHONE NO","CONTACT"])
-            address = get_value(row, ["VILLAGE","ADDRESS","PLACE"])
-            opening_balance = get_value(row, ["PENDING AMOUNT","PENDING","OPENING BALANCE","OLD PENDING","BALANCE"], 0)
+            rows = ws.iter_rows(values_only=True)
 
-            if pd.isna(name) or str(name).strip() == "":
-                continue
+            headers = next(rows)
+            headers = [
+                str(h).strip().replace("\n", " ").replace("\xa0", " ").upper()
+                if h is not None else ""
+                for h in headers
+            ]
 
-            name = str(name).strip()
-            phone = "" if pd.isna(phone) else str(phone).strip()
-            address = "" if pd.isna(address) else str(address).strip()
+            def col_index(possible_names):
+                for name in possible_names:
+                    name = name.strip().upper()
+                    if name in headers:
+                        return headers.index(name)
+                return None
 
-            if pd.isna(opening_balance) or opening_balance == "":
-                opening_balance = 0
-            else:
+            name_i = col_index(["NAME OF THE CONSUMER", "NAME", "CUSTOMER NAME", "CONSUMER NAME"])
+            phone_i = col_index(["MOBILE NO", "MOBILE", "PHONE", "PHONE NO", "CONTACT"])
+            address_i = col_index(["VILLAGE", "ADDRESS", "PLACE"])
+            pending_i = col_index(["PENDING AMOUNT", "PENDING", "OPENING BALANCE", "OLD PENDING", "BALANCE"])
+
+            data_to_insert = []
+
+            for row in rows:
+                name = row[name_i] if name_i is not None and name_i < len(row) else ""
+                phone = row[phone_i] if phone_i is not None and phone_i < len(row) else ""
+                address = row[address_i] if address_i is not None and address_i < len(row) else ""
+                opening_balance = row[pending_i] if pending_i is not None and pending_i < len(row) else 0
+
+                if name is None or str(name).strip() == "":
+                    continue
+
+                name = str(name).strip()
+                phone = "" if phone is None else str(phone).strip()
+                address = "" if address is None else str(address).strip()
+
                 try:
                     opening_balance = int(float(str(opening_balance).replace(",", "").replace("₹", "").strip()))
                 except:
                     opening_balance = 0
 
+                data_to_insert.append((name, phone, address, opening_balance, upload_id))
+
+            if data_to_insert:
+                execute_values(cursor, """
+                    INSERT INTO customers (name, phone, address, opening_balance, upload_id)
+                    VALUES %s
+                """, data_to_insert)
+
             cursor.execute("""
-                INSERT INTO customers (name, phone, address, opening_balance, upload_id)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (name, phone, address, opening_balance, upload_id))
-            inserted += 1
+                UPDATE uploads
+                SET total_records=%s, status='Success'
+                WHERE id=%s
+            """, (len(data_to_insert), upload_id))
+
+            conn.commit()
+            release_conn(conn)
+            return redirect("/upload_customers")
 
         cursor.execute("""
-            UPDATE uploads SET total_records=%s, status='Success' WHERE id=%s
-        """, (inserted, upload_id))
+            SELECT id, filename, total_records, status, date
+            FROM uploads
+            ORDER BY id DESC
+        """)
+        history = cursor.fetchall()
 
-        conn.commit()
         release_conn(conn)
-        return redirect("/upload_customers")
+        return render_template("upload.html", history=history)
 
-    cursor.execute("""
-        SELECT id, filename, total_records, status, date
-        FROM uploads ORDER BY id DESC
-    """)
-    history = cursor.fetchall()
-    release_conn(conn)
-    return render_template("upload.html", history=history)
-
+    except Exception as e:
+        conn.rollback()
+        release_conn(conn)
+        return f"Upload Error: {str(e)}"
 
 # ============================================================
 # DELETE UPLOAD
@@ -2580,7 +2600,6 @@ def download_all_pending_pdf():
 # ============================================================
 # RUN
 # ============================================================
-import webbrowser
+
 if __name__ == "__main__":
-    webbrowser.open("http://127.0.0.1:5000/login")
     app.run(debug=True)
