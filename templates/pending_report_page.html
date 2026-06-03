@@ -42,12 +42,24 @@
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-3">{{ r[0] }}</td>
                     <td class="p-3 font-semibold">{{ r[1] }}</td>
-                    <td class="p-3">{{ r[2] }}</td>
-                    <td class="p-3">₹{{ r[3] }}</td>
-                    <td class="p-3 text-green-700">₹{{ r[4] }}</td>
-                    <td class="p-3 text-blue-700">₹{{ r[5] }}</td>
-                    <td class="p-3 text-red-600 font-bold">₹{{ r[6] }}</td>
-                    <td class="p-3">{{ r[7] }}</td>
+
+                    <td class="p-3">₹{{ r[2] }}</td>
+
+                    <td class="p-3 text-green-700 font-semibold">
+                        ₹{{ r[3] }}
+                    </td>
+
+                    <td class="p-3 text-blue-700 font-semibold">
+                        ₹{{ r[4] }}
+                    </td>
+
+                    <td class="p-3 text-red-700 font-semibold">
+                        ₹{{ r[5] }}
+                    </td>
+
+                    <td class="p-3">
+                        {{ r[6] }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

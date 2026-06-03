@@ -2243,7 +2243,6 @@ def all_collections_page():
 # FIX: DATE('now') → CURRENT_DATE::TEXT, strftime → TO_CHAR
 # FIX: HAVING with alias → wrap in subquery (PostgreSQL doesn't allow HAVING on SELECT aliases)
 # ============================================================
-
 @app.route("/today_pending")
 @login_required
 def today_pending_page():
@@ -2263,7 +2262,7 @@ def today_pending_page():
                     - COALESCE((SELECT SUM(s2.paid) FROM sales s2 WHERE s2.customer_id = c.id), 0)
                     - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = c.id), 0)
                 ) AS final_pending,
-                CURRENT_DATE::TEXT AS date
+                MAX(s.date) AS date
             FROM customers c
             JOIN sales s ON s.customer_id = c.id
             WHERE s.date = CURRENT_DATE::TEXT
@@ -2296,7 +2295,7 @@ def monthly_pending_page():
                     - COALESCE((SELECT SUM(s2.paid) FROM sales s2 WHERE s2.customer_id = c.id), 0)
                     - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = c.id), 0)
                 ) AS final_pending,
-                TO_CHAR(CURRENT_DATE, 'YYYY-MM') AS date
+                MAX(s.date) AS date
             FROM customers c
             JOIN sales s ON s.customer_id = c.id
             WHERE TO_CHAR(s.date::DATE, 'YYYY-MM') = TO_CHAR(CURRENT_DATE, 'YYYY-MM')
@@ -2320,16 +2319,24 @@ def all_pending_page():
             SELECT
                 c.id,
                 c.name,
-                COALESCE((SELECT SUM(s.total) FROM sales s WHERE s.customer_id = c.id), 0) + COALESCE(c.opening_balance, 0) AS total_amount,
+                COALESCE((SELECT SUM(s.total) FROM sales s WHERE s.customer_id = c.id), 0)
+                + COALESCE(c.opening_balance, 0) AS total_amount,
+
                 COALESCE((SELECT SUM(s.paid) FROM sales s WHERE s.customer_id = c.id), 0) AS sale_paid,
+
                 COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = c.id), 0) AS payment_paid,
+
                 (
                     COALESCE(c.opening_balance, 0)
                     + COALESCE((SELECT SUM(s.total) FROM sales s WHERE s.customer_id = c.id), 0)
                     - COALESCE((SELECT SUM(s.paid) FROM sales s WHERE s.customer_id = c.id), 0)
                     - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = c.id), 0)
                 ) AS final_pending,
-                '-' AS date
+
+                COALESCE(
+                    (SELECT MAX(s.date) FROM sales s WHERE s.customer_id = c.id),
+                    CURRENT_DATE::TEXT
+                ) AS date
             FROM customers c
         ) sub
         WHERE final_pending != 0
@@ -2338,7 +2345,6 @@ def all_pending_page():
     data = cursor.fetchall()
     release_conn(conn)
     return render_template("pending_report_page.html", title="All Pending", data=data)
-
 
 # ============================================================
 # RECALCULATE CUSTOMER PENDING

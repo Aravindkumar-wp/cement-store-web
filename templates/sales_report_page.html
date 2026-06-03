@@ -34,9 +34,15 @@
                     <td class="p-3">{{ r[1] }}</td>
                     <td class="p-3">{{ r[2] }}</td>
                     <td class="p-3">{{ r[3] }}</td>
-                    <td class="p-3">₹{{ r[4] }}</td>
-                    <td class="p-3">₹{{ r[5] }}</td>
-                    <td class="p-3">₹{{ r[6] }}</td>
+                    <td class="p-3 font-semibold">₹{{ r[4] }}</td>
+
+                    <td class="p-3 text-green-700 font-semibold">
+                        ₹{{ r[5] }}
+                    </td>
+
+                    <td class="p-3 text-red-600 font-bold">
+                        ₹{{ r[6] }}
+                    </td>
                     <td class="p-3">{{ r[7] }}</td>
                 </tr>
                 {% endfor %}
