@@ -1276,7 +1276,7 @@ def add_worker():
         # FIX: DATE('now') → CURRENT_DATE::TEXT
         cursor.execute("""
             INSERT INTO worker_salary_history (worker_id, salary_per_day, from_date)
-            VALUES (%s, %s, CURRENT_DATE::TEXT)
+            VALUES (%s, %s, TO_CHAR(CURRENT_DATE, 'YYYY-MM') || '-01')
         """, (worker_id, salary))
 
         conn.commit()
@@ -1520,7 +1520,12 @@ def update_salary():
     conn = connect_db()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, salary_per_day FROM workers")
+
+        cursor.execute("""
+            SELECT id, name, salary_per_day
+            FROM workers
+            ORDER BY name ASC
+        """)
         workers = cursor.fetchall()
 
         if request.method == "POST":
@@ -1529,7 +1534,14 @@ def update_salary():
             from_month = request.form["from_month"]
             from_date = from_month + "-01"
 
-            cursor.execute("UPDATE workers SET salary_per_day=%s WHERE id=%s", (new_salary, worker_id))
+            # ✅ Update latest/current salary shown in UI
+            cursor.execute("""
+                UPDATE workers
+                SET salary_per_day=%s
+                WHERE id=%s
+            """, (new_salary, worker_id))
+
+            # ✅ Save salary history for correct month-wise calculation
             cursor.execute("""
                 INSERT INTO worker_salary_history (worker_id, salary_per_day, from_date)
                 VALUES (%s, %s, %s)
@@ -1539,9 +1551,11 @@ def update_salary():
             return redirect("/attendance_summary")
 
         return render_template("update_salary.html", workers=workers)
+
     except Exception as e:
         conn.rollback()
         raise e
+
     finally:
         release_conn(conn)
 
