@@ -2498,48 +2498,74 @@ def download_all_pending():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT 
-            c.id AS ID,
-            c.name AS Customer,
-            'Opening Balance' AS Items,
-            c.opening_balance AS Total,
-            0 AS Sale_Paid,
-            0 AS Payment,
-            c.opening_balance AS Final_Pending,
-            '-' AS Date
-        FROM customers c
-        WHERE c.opening_balance != 0
+        SELECT * FROM (
+            SELECT
+                c.id,
+                c.name,
 
-        UNION ALL
+                COALESCE(c.opening_balance, 0)
+                + COALESCE((SELECT SUM(s.total)
+                            FROM sales s
+                            WHERE s.customer_id = c.id), 0) AS total_due,
 
-        SELECT 
-            s.id,
-            c.name,
-            COALESCE(STRING_AGG(si.item || '(' || si.quantity::TEXT || ')', ', '), ''),
-            s.total,
-            s.paid,
-            COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = s.customer_id), 0),
-            s.pending - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = s.customer_id), 0),
-            s.date
-        FROM sales s
-        JOIN customers c ON s.customer_id = c.id
-        LEFT JOIN sale_items si ON s.id = si.sale_id
-        WHERE s.pending != 0
-        GROUP BY s.id, c.name, s.total, s.paid, s.pending, s.date, s.customer_id
+                COALESCE((SELECT SUM(s.paid)
+                          FROM sales s
+                          WHERE s.customer_id = c.id), 0) AS sale_paid,
 
-        ORDER BY Final_Pending DESC
+                COALESCE((SELECT SUM(p.amount)
+                          FROM payments p
+                          WHERE p.customer_id = c.id), 0) AS payment,
+
+                (
+                    COALESCE(c.opening_balance, 0)
+                    + COALESCE((SELECT SUM(s.total)
+                                FROM sales s
+                                WHERE s.customer_id = c.id), 0)
+                    - COALESCE((SELECT SUM(s.paid)
+                                FROM sales s
+                                WHERE s.customer_id = c.id), 0)
+                    - COALESCE((SELECT SUM(p.amount)
+                                FROM payments p
+                                WHERE p.customer_id = c.id), 0)
+                ) AS final_pending,
+
+                COALESCE(
+                    (SELECT MAX(s.date)
+                     FROM sales s
+                     WHERE s.customer_id = c.id),
+                    CURRENT_DATE::TEXT
+                ) AS date
+
+            FROM customers c
+        ) sub
+        WHERE final_pending != 0
+        ORDER BY final_pending DESC
     """)
+
     rows = cursor.fetchall()
     release_conn(conn)
 
-    columns = ["ID", "Customer", "Items", "Total", "Sale Paid", "Payment", "Final Pending", "Date"]
+    columns = [
+        "ID",
+        "Customer",
+        "Total Due",
+        "Sale Paid",
+        "Payment",
+        "Final Pending",
+        "Date"
+    ]
+
     df = pd.DataFrame(rows, columns=columns)
 
     output = io.BytesIO()
     df.to_excel(output, index=False)
     output.seek(0)
 
-    return send_file(output, download_name="all_pending_report.xlsx", as_attachment=True)
+    return send_file(
+        output,
+        download_name="all_pending_report.xlsx",
+        as_attachment=True
+    )
 
 
 # ============================================================
@@ -2554,68 +2580,113 @@ def download_all_pending_pdf():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT 
-            c.id,
-            c.name,
-            'Opening Balance',
-            c.opening_balance,
-            0,
-            0,
-            c.opening_balance,
-            '-'
-        FROM customers c
-        WHERE c.opening_balance != 0
+        SELECT * FROM (
+            SELECT
+                c.id,
+                c.name,
 
-        UNION ALL
+                COALESCE(c.opening_balance, 0)
+                + COALESCE((SELECT SUM(s.total)
+                            FROM sales s
+                            WHERE s.customer_id = c.id), 0) AS total_due,
 
-        SELECT 
-            s.id,
-            c.name,
-            COALESCE(STRING_AGG(si.item || '(' || si.quantity::TEXT || ')', ', '), ''),
-            s.total,
-            s.paid,
-            COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = s.customer_id), 0),
-            s.pending - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.customer_id = s.customer_id), 0),
-            s.date
-        FROM sales s
-        JOIN customers c ON s.customer_id = c.id
-        LEFT JOIN sale_items si ON s.id = si.sale_id
-        WHERE s.pending != 0
-        GROUP BY s.id, c.name, s.total, s.paid, s.pending, s.date, s.customer_id
+                COALESCE((SELECT SUM(s.paid)
+                          FROM sales s
+                          WHERE s.customer_id = c.id), 0) AS sale_paid,
 
-        ORDER BY 7 DESC
+                COALESCE((SELECT SUM(p.amount)
+                          FROM payments p
+                          WHERE p.customer_id = c.id), 0) AS payment,
+
+                (
+                    COALESCE(c.opening_balance, 0)
+                    + COALESCE((SELECT SUM(s.total)
+                                FROM sales s
+                                WHERE s.customer_id = c.id), 0)
+                    - COALESCE((SELECT SUM(s.paid)
+                                FROM sales s
+                                WHERE s.customer_id = c.id), 0)
+                    - COALESCE((SELECT SUM(p.amount)
+                                FROM payments p
+                                WHERE p.customer_id = c.id), 0)
+                ) AS final_pending,
+
+                COALESCE(
+                    (SELECT MAX(s.date)
+                     FROM sales s
+                     WHERE s.customer_id = c.id),
+                    CURRENT_DATE::TEXT
+                ) AS date
+
+            FROM customers c
+        ) sub
+        WHERE final_pending != 0
+        ORDER BY final_pending DESC
     """)
+
     rows = cursor.fetchall()
     release_conn(conn)
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
-    elements = []
-    styles = getSampleStyleSheet()
 
-    elements.append(Paragraph("<b>All Pending Report</b>", styles["Title"]))
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4)
+    )
+
+    styles = getSampleStyleSheet()
+    elements = []
+
+    elements.append(
+        Paragraph("<b>All Pending Report</b>", styles["Title"])
+    )
+
     elements.append(Spacer(1, 12))
 
-    data = [["ID", "Customer", "Items", "Total", "Sale Paid", "Payment", "Final Pending", "Date"]]
+    data = [[
+        "ID",
+        "Customer",
+        "Total Due",
+        "Sale Paid",
+        "Payment",
+        "Final Pending",
+        "Date"
+    ]]
+
     for r in rows:
-        data.append([r[0], r[1], r[2], f"₹{r[3]}", f"₹{r[4]}", f"₹{r[5]}", f"₹{r[6]}", r[7]])
+        data.append([
+            r[0],
+            r[1],
+            f"₹{r[2]}",
+            f"₹{r[3]}",
+            f"₹{r[4]}",
+            f"₹{r[5]}",
+            r[6]
+        ])
 
     table = Table(data, repeatRows=1)
+
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 7),
-        ("ALIGN", (3, 1), (-2, -1), "RIGHT"),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("ALIGN", (2, 1), (5, -1), "RIGHT"),
     ]))
+
     elements.append(table)
+
     doc.build(elements)
+
     buffer.seek(0)
 
-    return send_file(buffer, as_attachment=True, download_name="all_pending_report.pdf", mimetype="application/pdf")
-
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="all_pending_report.pdf",
+        mimetype="application/pdf"
+    )
 
 # ============================================================
 # RUN
