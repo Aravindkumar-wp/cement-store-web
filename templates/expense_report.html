@@ -16,48 +16,19 @@
 
             <ul class="space-y-3 text-sm">
                 <li><a href="/">🏠 Dashboard</a></li>
-                <li>
-                    <a href="/customers" class="block hover:text-gray-300">👥 Customers</a>
-                </li>
-
-                <li>
-                    <a href="/search" class="block hover:text-gray-300">🔍 Search</a>
-                </li>
-
-                <li>
-                    <a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a>
-                </li>
-
-                <li>
-                    <a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a>
-                </li>
-
-                <li>
-                    <a href="/payments" class="block hover:text-gray-300">💳 Payments</a>
-                </li>
-
-                <li>
-                    <a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a>
-                </li>
-
-
-
-
-
-                <li>
-                    <a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a>
-                </li>
-                <li>
-                    <a href="/attendance" class="block hover:text-gray-300"> 🧑‍🏭 Attendance</a>
-                </li>
-
-                <li>
-                    <a href="/worker_payments" class="block hover:text-gray-300"> 💸 Worker Advances</a>
-                </li>
-                <li>
-                    <a href="/suppliers" class="block hover:text-yellow-300">🏭 Suppliers</a>
-                </li>
+                <li><a href="/customers" class="block hover:text-gray-300">👥 Customers</a></li>
+                <li><a href="/search" class="block hover:text-gray-300">🔍 Search</a></li>
+                <li><a href="/add_customer" class="block hover:text-gray-300">➕ Add Customer</a></li>
+                <li><a href="/add_sale" class="block hover:text-gray-300">💰 Add Sale</a></li>
+                <li><a href="/payments" class="block hover:text-gray-300">💳 Payments</a></li>
+                <li><a href="/upload_customers" class="block hover:text-gray-300">📂 Upload Excel</a></li>
+                <li><a href="/download_report" class="block hover:text-gray-300">⬇️ Download Reports</a></li>
+                <li><a href="/attendance" class="block hover:text-gray-300">🧑‍🏭 Attendance</a></li>
+                <li><a href="/worker_payments" class="block hover:text-gray-300">💸 Worker Advances</a></li>
+                <li><a href="/suppliers" class="block hover:text-yellow-300">🏭 Suppliers</a></li>
                 <li><a href="/stock" class="block hover:text-gray-300">📦 Stock</a></li>
+                <li><a href="/hamali" class="block hover:text-gray-300">🧱 Hamali</a></li>
+                <li><a href="/diesel" class="block hover:text-gray-300">⛽ Diesel</a></li>
                 <li><a href="/expense_report" class="text-yellow-300 font-bold">📊 Labour & Transport Report</a></li>
                 <li><a href="/logout" class="block hover:text-red-300">📤 Logout</a></li>
             </ul>
@@ -71,23 +42,26 @@
             <!-- FILTER -->
             <div class="bg-white p-4 rounded shadow mb-6">
                 <form method="POST" class="flex gap-4">
-
                     <input type="date" name="from_date" value="{{ from_date }}" class="border p-2 rounded">
                     <input type="date" name="to_date" value="{{ to_date }}" class="border p-2 rounded">
 
                     <button class="bg-blue-600 text-white px-4 rounded">
                         Generate
                     </button>
-
                 </form>
             </div>
 
-            <!-- RESULT -->
-            <div class="grid grid-cols-3 gap-6">
+            <!-- TOP CARDS -->
+            <div class="grid grid-cols-4 gap-6">
 
                 <div class="bg-white p-4 rounded shadow text-center">
                     <h2 class="font-semibold">Labour</h2>
                     <p class="text-2xl font-bold text-blue-600">₹{{ labour }}</p>
+                </div>
+
+                <div class="bg-white p-4 rounded shadow text-center">
+                    <h2 class="font-semibold">Hamali</h2>
+                    <p class="text-2xl font-bold text-purple-600">₹{{ hamali }}</p>
                 </div>
 
                 <div class="bg-white p-4 rounded shadow text-center">
@@ -100,53 +74,34 @@
                     <p class="text-2xl font-bold text-red-600">₹{{ diesel }}</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5 mt-6">
+            </div>
 
-                    <div class="bg-white rounded-xl shadow p-5">
-                        <h2 class="font-bold mb-2">Total Labour Cost</h2>
+            <!-- FINAL COST CARDS -->
+            <div class="grid grid-cols-2 gap-5 mt-6">
 
-                        <input type="number" id="labourInput" placeholder="Enter labour amount"
-                            class="border p-2 rounded w-full mb-3">
+                <div class="bg-white rounded-xl shadow p-5">
+                    <h2 class="font-bold mb-2">Total Labour Cost</h2>
 
-                        <p class="text-sm text-gray-500">
-                            Entered Amount - Labour
-                        </p>
+                    <p class="text-sm text-gray-500">
+                        Labour - Hamali
+                    </p>
 
-                        <p class="text-2xl font-bold text-blue-700">
-                            ₹ <span id="labourResult">0</span>
-                        </p>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow p-5">
-                        <h2 class="font-bold mb-2">Total Transport Cost</h2>
-
-                        <p class="text-sm text-gray-500">
-                            Transport - Diesel
-                        </p>
-
-                        <p class="text-2xl font-bold text-green-700">
-                            ₹ <span id="transportResult">0</span>
-                        </p>
-                    </div>
-
+                    <p class="text-2xl font-bold text-blue-700">
+                        ₹ {{ labour_cost }}
+                    </p>
                 </div>
 
-                <script>
-                    const labourAmount = Number("{{ labour }}");
-                    const transportAmount = Number("{{ transport }}");
-                    const dieselAmount = Number("{{ diesel }}");
+                <div class="bg-white rounded-xl shadow p-5">
+                    <h2 class="font-bold mb-2">Total Transport Cost</h2>
 
-                    const labourInput = document.getElementById("labourInput");
+                    <p class="text-sm text-gray-500">
+                        Transport - Diesel
+                    </p>
 
-                    labourInput.addEventListener("input", function () {
-                        const entered = Number(this.value || 0);
-                        document.getElementById("labourResult").innerText = entered - labourAmount;
-                    });
-
-                    document.getElementById("transportResult").innerText = transportAmount - dieselAmount;
-                </script>
-
-
+                    <p class="text-2xl font-bold text-green-700">
+                        ₹ {{ transport_cost }}
+                    </p>
+                </div>
 
             </div>
 

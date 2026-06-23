@@ -268,6 +268,15 @@ def create_tables():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS hamali_expenses (
+            id SERIAL PRIMARY KEY,
+            amount INTEGER,
+            note TEXT,
+            date TEXT
+        )
+    """)
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS uploads (
             id SERIAL PRIMARY KEY,
             filename TEXT,
@@ -1007,6 +1016,43 @@ def payments():
         selected_customer=selected_customer,
         overall_pending=overall_pending
     )
+
+# ============================================================
+# DELETE PAYMENT
+# ============================================================
+
+@app.route("/delete_payment/<int:id>")
+@login_required
+def delete_payment(id):
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT customer_id FROM payments WHERE id=%s",
+        (id,)
+    )
+
+    row = cursor.fetchone()
+
+    if row:
+        customer_id = row[0]
+
+        cursor.execute(
+            "DELETE FROM payments WHERE id=%s",
+            (id,)
+        )
+
+        conn.commit()
+        release_conn(conn)
+
+        # Recalculate pending after delete
+        recalculate_customer_pending(customer_id)
+
+        return redirect(f"/payments?customer_id={customer_id}")
+
+    release_conn(conn)
+    return redirect("/payments")
 
 
 # ============================================================
@@ -2052,6 +2098,40 @@ def diesel():
 
 
 # ============================================================
+# HAMALI EXPENSES
+# ============================================================
+
+@app.route("/hamali", methods=["GET", "POST"])
+@login_required
+def hamali():
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        amount = int(request.form["amount"])
+        note = request.form.get("note", "")
+
+        cursor.execute("""
+            INSERT INTO hamali_expenses (amount, note, date)
+            VALUES (%s, %s, CURRENT_DATE::TEXT)
+        """, (amount, note))
+
+        conn.commit()
+        release_conn(conn)
+        return redirect("/hamali")
+
+    cursor.execute("""
+        SELECT amount, note, date
+        FROM hamali_expenses
+        ORDER BY id DESC
+    """)
+    data = cursor.fetchall()
+
+    release_conn(conn)
+    return render_template("hamali.html", data=data)
+
+
+# ============================================================
 # EXPENSE REPORT
 # FIX: ? → %s
 # ============================================================
@@ -2068,6 +2148,7 @@ def expense_report():
     labour_total = 0
     transport_total = 0
     diesel_total = 0
+    hamali_total = 0
 
     if from_date and to_date:
         cursor.execute("""
@@ -2083,11 +2164,19 @@ def expense_report():
         """, (from_date, to_date))
         diesel_total = cursor.fetchone()[0]
 
+        cursor.execute("""
+            SELECT COALESCE(SUM(amount),0) FROM hamali_expenses WHERE date BETWEEN %s AND %s
+        """, (from_date, to_date))
+        hamali_total = cursor.fetchone()[0]
+
     release_conn(conn)
     return render_template("expense_report.html",
         labour=labour_total,
         transport=transport_total,
         diesel=diesel_total,
+        hamali=hamali_total,
+        labour_cost=labour_total - hamali_total,
+        transport_cost=transport_total - diesel_total,
         from_date=from_date,
         to_date=to_date
     )
