@@ -1253,6 +1253,69 @@ def edit_sale(sale_id):
 
     return render_template("edit_sale.html", sale=sale, items=items, sale_id=sale_id)
 
+@app.route("/delete_sale/<int:sale_id>", methods=["POST"])
+@login_required
+def delete_sale(sale_id):
+    conn = connect_db()
+
+    try:
+        cursor = conn.cursor()
+
+        # Get customer id
+        cursor.execute("SELECT customer_id FROM sales WHERE id=%s", (sale_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            release_conn(conn)
+            return "Sale not found"
+
+        customer_id = row[0]
+
+        # Restore stock before deleting sale
+        cursor.execute("""
+            SELECT product_id, item, quantity
+            FROM sale_items
+            WHERE sale_id=%s
+        """, (sale_id,))
+        items = cursor.fetchall()
+
+        for product_id, item, qty in items:
+            qty = qty or 0
+
+            if product_id:
+                cursor.execute("""
+                    UPDATE products
+                    SET stock = COALESCE(stock, 0) + %s
+                    WHERE id=%s
+                """, (qty, product_id))
+            else:
+                cursor.execute("""
+                    UPDATE products
+                    SET stock = COALESCE(stock, 0) + %s
+                    WHERE name=%s
+                """, (qty, item))
+
+        # Delete sale items
+        cursor.execute("DELETE FROM sale_items WHERE sale_id=%s", (sale_id,))
+
+        # Delete sale
+        cursor.execute("DELETE FROM sales WHERE id=%s", (sale_id,))
+
+        conn.commit()
+        release_conn(conn)
+
+        # Recalculate customer pending if your function exists
+        try:
+            recalculate_customer_pending(customer_id)
+        except:
+            pass
+
+        return redirect(f"/customer/{customer_id}")
+
+    except Exception as e:
+        conn.rollback()
+        release_conn(conn)
+        return f"Error deleting sale: {str(e)}"
 
 # ============================================================
 # EDIT PAYMENT
